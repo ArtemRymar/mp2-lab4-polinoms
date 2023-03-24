@@ -21,16 +21,7 @@ private:
         Node* prev;
     public:
         Node(T _value, Node* _next, Node* _prev) : value(_value), next(_next), prev(_prev) {};
-
-        Node(const Node& tmp) : value(tmp.value), next(tmp.next), prev(tmp.prev) {};
-
-        Node& operator=(const Node& node) {
-            if (this != &node) {
-                this->value = node.value;
-                this->next = node.next;
-                this->prev = node.prev;
-            }
-        }
+        
     };
 
     Node* pFirst;
@@ -46,14 +37,15 @@ public:
 
     }
 
-    List(const List<T>& list) : pFirst(nullptr), sz(list.sz) {
+    List(const List& list) : pFirst(nullptr), sz(list.sz) {
         if (list.pFirst == nullptr) return;
 
-        pFirst = new Node{ *list.pFirst };
+        pFirst = new Node(*list.pFirst);
         Node* tmp = pFirst;
 
         while (tmp->next != nullptr) {
-            tmp->next = new Node{ *tmp->next };
+            tmp->next = new Node(*tmp->next);
+            tmp->next->prev = tmp;
             tmp = tmp->next;
 
         }
@@ -66,7 +58,7 @@ public:
     Node& ToPos(size_t pos) {
 
         if (isEmpty() || pos < 0 || pos > sz) {
-            string error = "Неверное значение позиции или пустой список"; throw error;
+            string error = "Invalid position value or empty list"; throw error;
         }
 
         if (pos == 0) return *pFirst;
@@ -97,7 +89,7 @@ public:
 
     void Print() {
         if (isEmpty()) {
-            string error = "Попытка вывести пустой полином"; throw error;
+            string error = "Trying to output an empty polynomial"; throw error;
         }
         Node* p = pFirst;
         while (p) {
@@ -108,15 +100,16 @@ public:
         cout << endl;
     }
 
-    List& operator=(const List<T>& list) {
+    List& operator=(const List& list) {
         this->~List();
 
-        pFirst = new Node{ *list.pFirst };
+        pFirst = new Node(*list.pFirst);
         Node* tmp = pFirst;
         sz = 0;
 
         while (tmp->next != nullptr) {
-            tmp->next = new Node{ *tmp->next };
+            tmp->next = new Node(*tmp->next);
+            tmp->next->prev = tmp;
             tmp = tmp->next;
             sz++;
         }
@@ -125,20 +118,21 @@ public:
     }
 
     List operator*(double x) {
-        if (x == 0) { string error = "Попытка умножить полниом на ноль"; throw error; }
+        if (x == 0) { string error = "Attempt to multiply the full term by zero"; throw error; }
 
         List<T> tmp;
         Node* p = pFirst;
 
         for (size_t i = 0; i <= sz; p = p->next) {
-            p->value.ex(x);
-            tmp.PushBack(p->value);
+            T mon(p->value.Get_coeff(), p->value.Get_degree());
+            mon.ex(x);
+            tmp.PushBack(mon);
             i++;
         }
         return tmp;
     }
 
-    List operator+(const List<T>& list) {
+    List operator+(const List& list) {
 
         int flag = -1;
         List<T> tmp;
@@ -185,11 +179,11 @@ public:
             flag++;
         }
 
-        if (flag == -1) { string error = "Сложение(вычитание) полиномов с одинаковыми степенями и противоположными коэффициентами"; throw error; }
+        if (flag == -1) { string error = "Addition (subtraction) of polynomials with the same degrees and opposite coefficients"; throw error; }
         else { return tmp; }
     }
 
-    List operator-(const List<T>& list) {
+    List operator-(const List& list) {
         double x = -1.0;
         List<T> tmp1(list);
         List<T> tmp2;
@@ -200,11 +194,11 @@ public:
         return tmp2;
     }
 
-    List operator*(const List<T>& list) {
+    List operator*(const List& list) {
 
         if (list.sz == -1) {
             string error;
-            error = "Попытка умножить на пустой полином";
+            error = "Trying to multiply by an empty polynomial";
             throw error;
         }
 

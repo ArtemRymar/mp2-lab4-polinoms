@@ -12,7 +12,7 @@ int main() {
     setlocale(LC_ALL, "Russian");
 
     try {
-        int n;
+        size_t n;
 
         cout << "Добро пожаловать в калькулятор для полиномов!" << endl;
         cout << "Особенности калькулятора:" << endl;
@@ -41,7 +41,7 @@ int main() {
 
             Monom tmp(coeff, degree);
 
-            monoms.push_back(tmp);
+            monoms.push_back(Monom(coeff, degree));
 
         }
 
